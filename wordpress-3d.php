@@ -16,6 +16,7 @@ class WP_3D {
 	public function __construct() {
 		add_shortcode( '3D', array('WP_3D', 'shortcode_3d') );
 		add_action( 'wp_enqueue_scripts', array('WP_3D', 'add_scripts') );
+		add_filter('mime_types',array('WP_3D', 'add_custom_mime_types'));
 	}
 	
 	// Activate the plugin
@@ -31,6 +32,12 @@ class WP_3D {
 		// Do nothing so far ;)
 	}
 	
+	function add_custom_mime_types($mimes){
+		return array_merge($mimes,array (
+			'dae' => 'model/vnd.collada+xml',
+		));
+	}
+		
 	public function add_scripts() {
 		wp_register_script('threejs', plugins_url('js/three.min.js', __FILE__), array(),'1.1', false);
 		wp_enqueue_script('threejs');
@@ -45,6 +52,10 @@ class WP_3D {
 	
 	// The 3D shortcode
 	public function shortcode_3d($atts, $content = null) {
+		$background = $atts['background'];
+		global $wpdb, $post;
+		$result = $wpdb->get_col($wpdb->prepare("SELECT guid FROM $wpdb->posts WHERE guid LIKE '%%%s' and post_parent=%d;", $atts['model'], $post->ID ));
+		$model = $result[0];
 		ob_start();
 		require('output.php');
 		return ob_get_clean();
