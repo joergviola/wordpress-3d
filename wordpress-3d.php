@@ -52,15 +52,34 @@ class WP_3D {
 	
 	// The 3D shortcode
 	public function shortcode_3d($atts, $content = null) {
-		$background = $atts['background'];
+		$width = self::get($atts['width'], '500');
+		$height = self::get($atts['height'], '300');
+		$background = self::get($atts['background'], 'ffffff');
+		$modelPosition = self::get($atts['model-position'], '0,0,0');
+		$modelScale = self::get($atts['model-scale'], '1,1,1');
+		$ambient = self::get($atts['ambient'], '404040');
+		$directional = explode(':', self::get($atts['directional'], '1,1,1:ffffff'));
+		$directionalPosition = $directional[0];
+		$directionalColor = $directional[1];
+		
 		global $wpdb, $post;
 		$result = $wpdb->get_col($wpdb->prepare("SELECT guid FROM $wpdb->posts WHERE guid LIKE '%%%s' and post_parent=%d;", $atts['model'], $post->ID ));
 		$model = $result[0];
+		$camera = self::createVector($atts['camera'], '50,50,30');
+		
 		ob_start();
 		require('output.php');
 		return ob_get_clean();
 	}
 	
+	private static function get(&$var, $default=null) {
+	    return isset($var) ? $var : $default;
+	}	
+	
+	private static function createVector(&$string, $default="0,0,0") {
+	    $string = self::get($string, $default);
+	    return explode(',', $string);
+	}
 }
 
 register_activation_hook(__FILE__, array('WP_3D', 'activate'));
