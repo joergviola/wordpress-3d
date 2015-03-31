@@ -2,6 +2,8 @@
 <div id="stage"></div>
 
 <script>
+    stage = document.getElementById("stage");  
+
 	width = 800;
 	height = 400;
 	
@@ -11,7 +13,7 @@
 	var renderer = new THREE.WebGLRenderer();
 	renderer.setSize( width, height );
 	renderer.setClearColor( 0x<?php echo $background ?>);
-	document.getElementById("stage").appendChild( renderer.domElement );	 
+	stage.appendChild( renderer.domElement );	 
 
 	var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 	var material = new THREE.MeshPhongMaterial( { 
@@ -34,7 +36,7 @@
 	camera.position.y = 50;
 	camera.position.z = 30;
 	
-	controls = new THREE.OrbitControls( camera );
+	controls = new THREE.OrbitControls( camera, stage );
 	controls.damping = 0.2;
 	controls.addEventListener( 'change', render );
 
