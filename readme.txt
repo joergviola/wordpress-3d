@@ -4,7 +4,7 @@ Donate link: http://www.joergviola.de
 Tags: 3d, webgl, threejs, 3d model display, 3D model viewer, 3D Model Viewer WordPress, dae viewer
 Requires at least: 4.0.0
 Tested up to: 4.2
-Stable tag: 1.8
+Stable tag: 1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,7 +63,7 @@ None yet.
 
 == Changelog ==
 
-= 1.8 =
+= 1.9 =
 * Parameter rename: model-scale => modelscale, model-position => modelposition
 * Multiple 3D stages on one page possible
 * New material option for OBJ/MTL
