@@ -99,8 +99,8 @@ class WP_3D {
     		'height' => self::get($atts['height'], '300'),
     		'background' => self::get($atts['background'], 'ffffff'),
     		'opacity' => self::get($atts['opacity'], 1),
-    		'modelPosition' => self::createVector($atts['model-position'], '0,0,0'),
-    		'modelScale' => self::createVector($atts['model-scale'], '1,1,1'),
+    		'modelPosition' => self::createVector($atts['modelposition'], '0,0,0'),
+    		'modelScale' => self::createVector($atts['modelscale'], '1,1,1'),
     		'ambient' => hexdec(self::get($atts['ambient'], '404040')),
     		'directionalPosition' => self::createVector($directional[0]),
     		'directionalColor' => hexdec($directional[1]),
@@ -109,8 +109,9 @@ class WP_3D {
     		'id' => self::get($atts['id'], 'stage'),
     		'fps' => self::get($atts['fps'], 30),
 		    'camera' => self::createVector($atts['camera'], '50,50,30'),
+    		'fov' => self::get($atts['fov'], 75),
+		    'material' => self::get($atts['material']),
 	    );		
-		
 		ob_start();
 		require('output.php');
 		return ob_get_clean();

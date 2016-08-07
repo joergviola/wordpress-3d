@@ -2,13 +2,23 @@
 
 function WP3D(model, options) {
 
-	this.init = function(model, options) {
-	    this.stage = document.getElementById(options.id);  
+	var self = this;
+
+	self.lastRendered = Date.now();
+	self.dirty = false;
+
+	self.setDirty = function() {
+		self.dirty = true;
+	}
+
+
+	self.init = function(model, options) {
+	    self.stage = document.getElementById(options.id);  
 	    
 	    width = 0;
 	    pWidth = options.width;
 	    if (pWidth.indexOf('%')==pWidth.length-1) {
-	        width = this.stage.offsetWidth * parseInt(pWidth) / 100;
+	        width = self.stage.offsetWidth * parseInt(pWidth) / 100;
 	    } else {
 	        width = parseInt(pWidth);
 	    }
@@ -16,64 +26,62 @@ function WP3D(model, options) {
 	    height = 0;
 	    pHeight = options.height;
 	    if (pHeight.indexOf('%')==pHeight.length-1) {
-	    	height = this.stage.offsetHeight * parseInt(pHeight) / 100;
+	    	height = self.stage.offsetHeight * parseInt(pHeight) / 100;
 	    } else {
 	    	height = parseInt(pHeight);
 	    }
 	    
-	    this.scene = new THREE.Scene();
-	    this.camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 1000 );
-	    this.camera.position.x = options.camera[0];
-	    this.camera.position.y = options.camera[1];
-	    this.camera.position.z = options.camera[2];
+	    self.scene = new THREE.Scene();
+	    self.camera = new THREE.PerspectiveCamera( options.fov, width / height, 0.1, 1000 );
+	    self.camera.position.x = options.camera[0];
+	    self.camera.position.y = options.camera[1];
+	    self.camera.position.z = options.camera[2];
 		
-		this.renderer = new THREE.WebGLRenderer({ alpha: true });
-		this.renderer.setSize( width, height );
-		this.renderer.setClearColor( options.background, options.opacity);
-		this.stage.appendChild( this.renderer.domElement );	 
+		self.renderer = new THREE.WebGLRenderer({ alpha: true });
+		self.renderer.setSize( width, height );
+		self.renderer.setClearColor( options.background, options.opacity);
+		self.stage.appendChild( self.renderer.domElement );	 
 	
 		var directionalLight = new THREE.DirectionalLight( options.directionalColor, 1 );
 		directionalLight.position.set( options.directionalPosition[0], options.directionalPosition[1], options.directionalPosition[2] );
-		this.scene.add( directionalLight );
+		self.scene.add( directionalLight );
 			
 		var light = new THREE.AmbientLight( options.ambient ); // soft white light
-		this.scene.add( light );
+		self.scene.add( light );
 		
-		controls = new THREE.OrbitControls( this.camera, this.stage );
+		controls = new THREE.OrbitControls( self.camera, self.stage );
 		controls.damping = 0.2;
-		controls.addEventListener( 'change', setDirty );
+		controls.addEventListener( 'change', self.setDirty.bind(self) );
 		
-		console.log(model);
-		
-		if (this.endsWith(model, '.dae'))
-			this.loadDAE(model, options);
-		else if (this.endsWith(model, '.obj'))
-			this.loadOBJ(model, options);
-		else if (this.endsWith(model, '.objmtl'))
-			this.loadOBJMTL(model, options);
+		if (self.endsWith(model, '.dae'))
+			self.loadDAE(model, options);
+		else if (self.endsWith(model, '.obj'))
+			self.loadOBJ(model, options);
+		else if (self.endsWith(model, '.objmtl'))
+			self.loadOBJMTL(model, options);
 		
 	}
 
-	this.endsWith = function(str, suffix) {
+	self.endsWith = function(str, suffix) {
 	    return str.toLowerCase().indexOf(suffix.toLowerCase(), str.length - suffix.length) !== -1;
 	}
 	
-	this.progress = function(event) {
+	self.progress = function(event) {
 		loaded = event.loaded;
 		total = event.total;
 		console.log(loaded + " of "+total);
 	}
 	
-	this.failure = function() {
-		this.stage.innerHTML = 'Could not load model.';
+	self.failure = function() {
+		self.stage.innerHTML = 'Could not load model.';
 		console.log('Could not load model.');
 	}
 	
-	this.loadDAE = function(model, options) {
-		console.log('loading DAE');
+	self.loadDAE = function(model, options) {
+		console.log('loading DAE: ' + model);
 		var loader = new THREE.ColladaLoader();
 		loader.options.convertUpAxis = true;
-		var loadScene = this.scene;
+		var loadScene = self.scene;
 		loader.load(model, function ( collada ) {
 		  var dae = collada.scene;
 		  var skin = collada.skins[ 0 ];
@@ -81,63 +89,58 @@ function WP3D(model, options) {
 		  dae.scale.set(options.modelScale[0],options.modelScale[1],options.modelScale[2]);
 	
 		  loadScene.add(dae);
-		  dirty = true;
-			console.log('object loaded');
-		}, this.progress, this.failure);
+		  self.dirty = true;
+		  console.log('object loaded');
+		}, self.progress, self.failure);
 	}
 
-	this.loadOBJ = function(model, options) {
-		console.log('loading OBJ');
-		var loader = new THREE.OBJLoader();
-		var loadScene = this.scene;
-		loader.load( model, function ( object ) {
+	self.loadOBJ = function(model, options) {
+		console.log('loading OBJ: ' + model);
+
+		onload = function ( object ) {
 			object.position.set(options.modelPosition[0],options.modelPosition[1],options.modelPosition[2]);//x,z,y- if you think in blender dimensions ;)
 			object.scale.set(options.modelScale[0],options.modelScale[1],options.modelScale[2]);
 			loadScene.add( object );
-			dirty = true;
+			self.dirty = true;
 			console.log('object loaded');
-		}, this.progress, this.failure);
+		}
+
+		var loadScene = self.scene;
+		if (options.material) {
+			var loader = new THREE.OBJMTLLoader();
+			loader.load( model, options.material, onload, self.progress, self.failure);
+		} else {
+			var loader = new THREE.OBJLoader();
+			loader.load( model, onload, self.progress, self.failure);
+		}
+
 	}
 
-	this.loadOBJMTL = function(model, options) {
-		console.log('loading OBJMTL');
+	self.loadOBJMTL = function(model, options) {
 		var loader = new THREE.OBJMTLLoader();
 		mtl = model.substring(0, model.length-6) + 'mtl';
-		var loadScene = this.scene;
+		console.log('loading OBJMTL:' + model + ", " + mtl);
+		var loadScene = self.scene;
 		loader.load( model, mtl, function ( object ) {
 			object.position.set(options.modelPosition[0],options.modelPosition[1],options.modelPosition[2]);//x,z,y- if you think in blender dimensions ;)
 			object.scale.set(options.modelScale[0],options.modelScale[1],options.modelScale[2]);
 			loadScene.add( object );
-			dirty = true;
+			self.dirty = true;
 			console.log('object loaded');
-		}, this.progress, this.failure);
+		}, self.progress, self.failure);
 	}
 	
-	
-	this.init(model, options);
-	
-	this.render = function() {
-    	this.renderer.render( this.scene, this.camera );
+	self.render = function() {
+		requestAnimationFrame( self.render.bind(self) );
+
+	    delta = Date.now() - self.lastRendered;
+	    if (self.dirty && delta > 1000/options.fps) {
+	    	self.renderer.render( self.scene, self.camera );
+	    	self.lastRendered = Date.now();
+	    	self.dirty = false;
+	    }
 	}
 	
+	self.init(model, options);
 }
 
-lastRendered = Date.now();
-dirty = true;
-
-function setDirty() {
-	dirty = true;
-}
-
-
-function render() {
-	requestAnimationFrame( render );
-
-    delta = Date.now() - lastRendered;
-    if (dirty && delta > 1000/options.fps) {
-    	lastRendered = Date.now();
-    	wp3d.render();
-    	dirty = false;
-    }
-	
-}

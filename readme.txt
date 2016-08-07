@@ -4,7 +4,7 @@ Donate link: http://www.joergviola.de
 Tags: 3d, webgl, threejs, 3d model display, 3D model viewer, 3D Model Viewer WordPress, dae viewer
 Requires at least: 4.0.0
 Tested up to: 4.2
-Stable tag: 1.7
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,8 +23,6 @@ Please file a request for other required file formats.
 The 3D stage is highly configurable: Define background, ambient or directional light 
 as well as the cameras and your models position and scale.
 
-For a good application example, [look here](http://openbuilds.com.mx/tienda_de_openbuilds_mexico/guia-lineal-v-slot/#) (thanks to Ronald van Arkel):
-
 
 
 == Installation ==
@@ -33,22 +31,25 @@ Install this plugin from the wordpress plugin directory as usual and activate it
 Add the shortcode [3D], wherever you want your model to appear.
 Here are the arguments to this short code:
 
-* model: name of the model file in the media gallery or full URL. Mandatory. Use *.objmtl if you want OBJ/MTL and name the MTL file exaclty as the OBJMTL file.
+* model: name of the model file in the media gallery or full URL. Mandatory. Using OBJ/MTL? - Use the material option below to specify path to the mtl file.
 * width, height: Size of the 3d stage. If in percent, then relative to the size of the div around the canvas. Optional, default is 500x300.
 * background: Background color. Optional, default is "ffffff".
 * opacity: Background opacity. Optional, default is 1.
 * ambient: Color of ambient light. Optional, default is "404040".
 * directional: Direction and color of directional light source. Optional, default is "1,1,1:ffffff"
-* model-position: Point of origin of the model. Optional, default is "0,0,0".
-* model-scale: Scale of the model. Optional, default is "1,1,1".
+* modelposition: Point of origin of the model. Optional, default is "0,0,0".
+* modelscale: Scale of the model. Optional, default is "1,1,1".
 * class: CSS class of div around canvas. Optional, no default.
 * style: CSS style of div around canvas. Optional, no default.
 * id: id of div around canvas. Optional, default is "stage".
 * fps: Number of animation frames per second. Optional, default is 30.
+* material: URL of OBJ/MTL file.
+* camera: Camera coordinates, default is 50,50,30.
+* fov: Camera field-of-view in degrees. Default is 75.
 
 Example:
 
-[3D width="600" height="400" background="436523" opacity="0.5" model="dummy1.dae" camera="50,50,300" model-position="2,2,2" model-scale="2,2,2" ambient="BBBBBB" directional="1,1,0:FFFF44" class="3d" style="float: right" id="coffee" fps=20]
+[3D width="600" height="400" background="436523" opacity="0.5" model="dummy1.dae" camera="50,50,300" modelposition="2,2,2" modelscale="2,2,2" ambient="BBBBBB" directional="1,1,0:FFFF44" class="3d" style="float: right" id="coffee" fps=20]
 
 
 
@@ -61,6 +62,12 @@ None yet.
 1. The plugin in action
 
 == Changelog ==
+
+= 1.8 =
+* Parameter rename: model-scale => modelscale, model-position => modelposition
+* Multiple 3D stages on one page possible
+* New material option for OBJ/MTL
+* New fov-parameter
 
 = 1.7 =
 * Find models not attached to page or when full URL is given

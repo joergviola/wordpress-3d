@@ -3,14 +3,17 @@
 
 <script>
 
-var wp3d = null;
-
-window.onload = function() {
+callback = function() {
     options = <?php echo json_encode($options) ?>;
-
     wp3d = new WP3D('<?php echo $model ?>', options);
-
-    render();
+    wp3d.render();
 }
+
+if(window.addEventListener){
+  window.addEventListener('load',callback,false);
+} else {
+  window.attachEvent('onload',callback);
+}
+
 </script>
 
