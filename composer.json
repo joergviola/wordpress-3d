@@ -1,0 +1,20 @@
+{
+    "name": "joergviola/3d-model-viewer",
+    "type": "wordpress-plugin",
+    "description": "Easily display your 3D-models. Upload to media gallery, add shortcode - ready! ",
+    "homepage": "https://wordpress.org/plugins/3d-model-viewer/",
+    "license": "GPL2+",
+    "authors": [
+        {
+            "name": "joergviola",
+            "homepage": "http://www.joergviola.de"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/joergviola/wordpress-3d",
+        "forum": "https://wordpress.org/support/plugin/3d-model-viewer"
+    },
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}
